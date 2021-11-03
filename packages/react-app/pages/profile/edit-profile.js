@@ -1,13 +1,15 @@
 import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack, Image, Textarea } from "@chakra-ui/react";
 import { Box } from "@chakra-ui/layout";
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { EthereumAuthProvider, SelfID, WebClient } from "@self.id/web";
 import { useRouter } from "next/router";
 // import Image from "next/image";
 import modelAliases from "../../model.json";
 import { ceramicCoreFactory, CERAMIC_TESTNET, CERAMIC_TESTNET_NODE_URL } from "../../ceramic";
 import { Web3Context } from "../../helpers/Web3Context";
+import 'emoji-mart/css/emoji-mart.css'
+import { Picker } from 'emoji-mart'
 
 const EditProfilePage = () => {
   const { address, targetNetwork, self } = useContext(Web3Context);
@@ -15,6 +17,7 @@ const EditProfilePage = () => {
   const router = useRouter();
   const [imageURL, setImageURL] = useState();
   const [backgroundURL, setBackgroundURL] = useState();
+  const [emoji, setEmoji] = useState()
   const image = useRef(null);
   const background = useRef(null);
   const {
@@ -22,6 +25,7 @@ const EditProfilePage = () => {
     register,
     formState: { errors, isSubmitting },
     setValue,
+    control,
   } = useForm();
 
   useEffect(() => {
@@ -84,7 +88,9 @@ const EditProfilePage = () => {
   }, []);
 
   const onSubmit = async values => {
-    console.log(values);
+    console.log('VALUES ', values);
+    console.log('emoji', emoji)
+    values.emoji = emoji
     const formData = new FormData();
     formData.append("type", "image/*");
     const [imageFile] = values.image;
@@ -193,13 +199,15 @@ const EditProfilePage = () => {
             </FormControl>
             <FormControl isInvalid={errors.emoji}>
               <FormLabel htmlFor="emoji">Emoji</FormLabel>
-              <Input
+              {/* <Input
                 placeholder="🚀"
                 borderColor="purple.500"
                 {...register("emoji", {
                   maxLength: 2,
                 })}
-              />
+              /> */}
+              <Picker onSelect={(emoji) => setEmoji(emoji.native)} />
+
               <FormErrorMessage>{errors.emoji && errors.emoji.message}</FormErrorMessage>
             </FormControl>
             <FormControl isInvalid={errors.birthDate}>
