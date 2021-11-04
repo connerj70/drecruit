@@ -10,6 +10,7 @@ import { ceramicCoreFactory, CERAMIC_TESTNET, CERAMIC_TESTNET_NODE_URL } from ".
 import { Web3Context } from "../../helpers/Web3Context";
 import 'emoji-mart/css/emoji-mart.css'
 import { Picker } from 'emoji-mart'
+import { Emoji } from 'emoji-mart'
 
 const EditProfilePage = () => {
   const { address, targetNetwork, self } = useContext(Web3Context);
@@ -19,6 +20,7 @@ const EditProfilePage = () => {
   const [backgroundURL, setBackgroundURL] = useState();
   const [emoji, setEmoji] = useState()
   const image = useRef(null);
+  const [selectEmoji, setSelectEmoji] = useState(false);
   const background = useRef(null);
   const {
     handleSubmit,
@@ -90,7 +92,7 @@ const EditProfilePage = () => {
   const onSubmit = async values => {
     console.log('VALUES ', values);
     console.log('emoji', emoji)
-    values.emoji = emoji
+    values.emoji = emoji.native
     const formData = new FormData();
     formData.append("type", "image/*");
     const [imageFile] = values.image;
@@ -197,17 +199,28 @@ const EditProfilePage = () => {
               />
               <FormErrorMessage>{errors.description && errors.description.message}</FormErrorMessage>
             </FormControl>
-            <FormControl isInvalid={errors.emoji}>
-              <FormLabel htmlFor="emoji">Emoji</FormLabel>
-              {/* <Input
-                placeholder="🚀"
-                borderColor="purple.500"
-                {...register("emoji", {
-                  maxLength: 2,
-                })}
-              /> */}
-              <Picker onSelect={(emoji) => setEmoji(emoji.native)} />
-
+            <FormControl>
+              <div>
+                <FormLabel htmlFor="emoji">Emoji</FormLabel>
+                <Button mb={2} onClick={ () => setSelectEmoji(!selectEmoji) }>Toggle emoji picker</Button>
+              </div>
+              { selectEmoji ? 
+                <Picker title="" color="purple.500" onSelect={(emoji) => { 
+                  setEmoji(emoji)
+                  setSelectEmoji(false)
+                }} /> 
+              : 
+                '' 
+              }
+              { emoji ?
+                <div>
+                  <h3>Your current emoji</h3>
+                  <Emoji emoji={emoji} size={26} />
+                  <span style={{marginLeft: "10px", cursor: "pointer"}} onClick={ () => setEmoji(null) }>Clear</span>
+                </div>
+                :
+                ''
+              }
               <FormErrorMessage>{errors.emoji && errors.emoji.message}</FormErrorMessage>
             </FormControl>
             <FormControl isInvalid={errors.birthDate}>
